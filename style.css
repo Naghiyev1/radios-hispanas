@@ -398,3 +398,156 @@ audio {
     bottom: 10px;
   }
 }
+
+
+/* v4 mobile polish */
+
+.station-card {
+  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+}
+
+.station-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(37, 99, 235, 0.24);
+}
+
+.player audio::-webkit-media-controls-panel {
+  border-radius: 999px;
+}
+
+@media (max-width: 840px) {
+  body {
+    padding-bottom: 178px;
+  }
+
+  .hero-main {
+    min-height: auto;
+  }
+
+  .hero-side {
+    display: none;
+  }
+
+  .eyebrow {
+    font-size: 12px;
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-size: clamp(42px, 13vw, 58px);
+  }
+
+  .hero-main p {
+    font-size: 16px;
+  }
+
+  .filter-pills {
+    margin-left: -16px;
+    margin-right: -16px;
+    padding-left: 16px;
+    padding-right: 16px;
+    scrollbar-width: none;
+  }
+
+  .filter-pills::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pill {
+    padding: 11px 15px;
+    font-size: 14px;
+  }
+
+  .status-bar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 14px;
+  }
+
+  .stations-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .station-card {
+    min-height: auto;
+    padding: 15px;
+    border-radius: 20px;
+  }
+
+  .station-logo-wrap {
+    width: 54px;
+    height: 54px;
+    flex-basis: 54px;
+  }
+
+  .station-name {
+    font-size: 16px;
+  }
+
+  .station-tags {
+    min-height: auto;
+  }
+
+  .station-actions {
+    grid-template-columns: 1fr 58px;
+    gap: 10px;
+  }
+
+  .station-actions button {
+    min-height: 48px;
+    font-size: 15px;
+  }
+
+  .favorite-button {
+    font-size: 20px;
+  }
+
+  .player {
+    padding: 14px;
+    border-radius: 22px;
+    gap: 12px;
+  }
+
+  .now-playing strong {
+    font-size: 15px;
+  }
+
+  .now-playing span {
+    font-size: 12px;
+  }
+
+  audio {
+    height: 44px;
+  }
+}
+
+@media (max-width: 420px) {
+  .app-shell {
+    padding: 12px;
+  }
+
+  .hero-main {
+    padding: 22px;
+    border-radius: 20px;
+  }
+
+  .controls {
+    padding: 12px;
+    border-radius: 20px;
+    gap: 10px;
+  }
+
+  input,
+  select,
+  button {
+    min-height: 48px;
+  }
+
+  .player {
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+  }
+}
