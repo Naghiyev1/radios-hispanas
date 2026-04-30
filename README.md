@@ -11,6 +11,9 @@ A simple, free radio player for Spanish-speaking radio stations across Spain, La
 - Includes quick filters such as News, Music, Talk, Sports, Latin, Salsa and Rock
 - Saves favourites locally in the browser
 - Saves recently played stations locally in the browser
+- Includes mobile layout polish
+- Includes a web app manifest, app icon and service worker
+- Can be added to a phone home screen as a lightweight PWA
 - Requires no login, no backend and no paid services
 
 ## Tech stack
@@ -20,6 +23,7 @@ A simple, free radio player for Spanish-speaking radio stations across Spain, La
 - JavaScript
 - GitHub Pages
 - Radio Browser public API
+- Progressive Web App basics
 
 ## Project structure
 
@@ -29,6 +33,9 @@ radios-hispanas/
   style.css
   app.js
   README.md
+  icon.svg
+  manifest.json
+  service-worker.js
 ```
 
 ## Run locally
@@ -59,6 +66,24 @@ http://localhost:8000
    - Folder: `/root`
 6. Save.
 
+## Install on mobile
+
+After deployment:
+
+### iPhone / Safari
+
+1. Open the site in Safari.
+2. Tap the share icon.
+3. Tap **Add to Home Screen**.
+
+### Android / Chrome
+
+1. Open the site in Chrome.
+2. Tap the browser menu.
+3. Tap **Install app** or **Add to Home screen**.
+
 ## Notes
 
 Some stations may not play because of broken streams, browser restrictions, mixed-content issues or stream formats. The app filters for stations marked as working by the Radio Browser API, but internet radio data is never perfect.
+
+The service worker caches the app shell, not the radio streams. Live radio still requires internet access.
