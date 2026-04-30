@@ -18,7 +18,32 @@ let activeTag = "";
 let favoriteStations = JSON.parse(localStorage.getItem("radiosHispanasFavoriteStations") || "[]");
 let favorites = favoriteStations.map(station => station.stationuuid);
 
+const spanishSpeakingCountryCodes = [
+  "ES",
+  "MX",
+  "AR",
+  "CO",
+  "CL",
+  "PE",
+  "VE",
+  "EC",
+  "BO",
+  "PY",
+  "UY",
+  "CR",
+  "PA",
+  "DO",
+  "GT",
+  "HN",
+  "SV",
+  "NI",
+  "CU",
+  "PR",
+  "US"
+];
+
 const countryNames = {
+  ALL: "All countries",
   ES: "Spain",
   MX: "Mexico",
   AR: "Argentina",
@@ -56,43 +81,25 @@ async function fetchStations() {
   const searchTerm = searchInput.value.trim();
   const selectedCountryName = countryNames[countryCode] || countryCode;
 
-  statusText.textContent = "Loading stations...";
+  statusText.textContent = countryCode === "ALL"
+    ? "Loading stations across Spanish-speaking countries..."
+    : "Loading stations...";
+
   activeFilterLabel.textContent = `${selectedCountryName} · ${activeTag || searchTerm || "Popular"}`;
   stationsGrid.innerHTML = "";
   stationCount.textContent = "0";
 
-  const params = new URLSearchParams({
-    countrycode: countryCode,
-    hidebroken: "true",
-    order: "clickcount",
-    reverse: "true",
-    limit: "80"
-  });
-
-  if (searchTerm) {
-    params.set("name", searchTerm);
-  }
-
-  if (activeTag) {
-    params.set("tag", activeTag);
-  }
-
-  const url = `${API_BASE}/stations/search?${params.toString()}`;
-
   try {
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error("Radio API request failed.");
-    }
-
-    const data = await response.json();
+    const data = countryCode === "ALL"
+      ? await fetchStationsForAllCountries(searchTerm, activeTag)
+      : await fetchStationsForCountry(countryCode, searchTerm, activeTag, 80);
 
     stations = data
       .filter(station => station.lastcheckok === 1)
       .filter(station => station.url_resolved || station.url)
       .filter(removeDuplicatesByUrl)
-      .slice(0, 60);
+      .sort(sortStations)
+      .slice(0, countryCode === "ALL" ? 120 : 60);
 
     renderStations(stations);
 
@@ -105,6 +112,56 @@ async function fetchStations() {
     statusText.textContent = "Could not load stations. The free radio directory may be temporarily unavailable.";
     stationsGrid.innerHTML = `<div class="empty-state">Something went wrong while loading stations.</div>`;
   }
+}
+
+async function fetchStationsForAllCountries(searchTerm, tag) {
+  const requests = spanishSpeakingCountryCodes.map(countryCode =>
+    fetchStationsForCountry(countryCode, searchTerm, tag, 18)
+      .catch(error => {
+        console.warn(`Could not load ${countryCode}`, error);
+        return [];
+      })
+  );
+
+  const countryResults = await Promise.all(requests);
+  return countryResults.flat();
+}
+
+async function fetchStationsForCountry(countryCode, searchTerm, tag, limit = 80) {
+  const params = new URLSearchParams({
+    countrycode: countryCode,
+    hidebroken: "true",
+    order: "clickcount",
+    reverse: "true",
+    limit: String(limit)
+  });
+
+  if (searchTerm) {
+    params.set("name", searchTerm);
+  }
+
+  if (tag) {
+    params.set("tag", tag);
+  }
+
+  const url = `${API_BASE}/stations/search?${params.toString()}`;
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Radio API request failed for ${countryCode}.`);
+  }
+
+  return response.json();
+}
+
+function sortStations(a, b) {
+  const clickDifference = Number(b.clickcount || 0) - Number(a.clickcount || 0);
+
+  if (clickDifference !== 0) {
+    return clickDifference;
+  }
+
+  return String(a.name || "").localeCompare(String(b.name || ""));
 }
 
 function removeDuplicatesByUrl(station, index, array) {
