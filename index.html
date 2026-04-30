@@ -82,6 +82,7 @@
       </select>
 
       <button id="searchButton" type="button">Search</button>
+      <button id="themeToggle" class="theme-toggle" type="button" aria-label="Toggle dark mode">🌙</button>
     </section>
 
     <section class="filter-pills" aria-label="Quick filters">
@@ -109,12 +110,19 @@
   </div>
 
   <footer class="player" aria-label="Audio player">
-    <div class="now-playing">
-      <strong id="currentStation">Nothing playing</strong>
-      <span id="currentMeta">Choose a station to start listening</span>
+    <div class="player-station">
+      <div id="playerLogo" class="player-logo">RH</div>
+      <div class="now-playing">
+        <strong id="currentStation">Nothing playing</strong>
+        <span id="currentMeta">Choose a station to start listening</span>
+      </div>
     </div>
 
-    <audio id="audioPlayer" controls></audio>
+    <div class="player-actions">
+      <button id="playerFavoriteButton" class="player-icon-button" type="button" aria-label="Toggle current station favourite" disabled>★</button>
+      <button id="stopButton" class="player-stop-button" type="button" disabled>Stop</button>
+      <audio id="audioPlayer" controls></audio>
+    </div>
   </footer>
 
   <script src="app.js"></script>
