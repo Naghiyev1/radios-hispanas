@@ -6,6 +6,7 @@ A simple, free radio player for Spanish-speaking radio stations across Spain, La
 
 - Searches live radio stations by country
 - Includes an **All Spanish-speaking countries** mode
+- Includes a curated **Featured** section for well-known Spanish-speaking stations
 - Supports Spain, Mexico, Argentina, Colombia, Chile, Peru, Venezuela, Ecuador, Bolivia, Paraguay, Uruguay, Costa Rica, Panama, Dominican Republic, Guatemala, Honduras, El Salvador, Nicaragua, Cuba, Puerto Rico and the United States
 - Plays stations directly in the browser
 - Includes quick filters such as News, Music, Talk, Sports, Latin, Salsa and Rock
@@ -86,4 +87,4 @@ After deployment:
 
 Some stations may not play because of broken streams, browser restrictions, mixed-content issues or stream formats. The app filters for stations marked as working by the Radio Browser API, but internet radio data is never perfect.
 
-The service worker caches the app shell, not the radio streams. Live radio still requires internet access.
+The Featured section is curated by station name and country, then resolved through the free Radio Browser API. This avoids hardcoding fragile stream URLs, but availability still depends on the public directory.
