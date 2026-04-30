@@ -9,6 +9,10 @@ const searchButton = document.getElementById("searchButton");
 const audioPlayer = document.getElementById("audioPlayer");
 const currentStation = document.getElementById("currentStation");
 const currentMeta = document.getElementById("currentMeta");
+const playerLogo = document.getElementById("playerLogo");
+const playerFavoriteButton = document.getElementById("playerFavoriteButton");
+const stopButton = document.getElementById("stopButton");
+const themeToggle = document.getElementById("themeToggle");
 const stationCount = document.getElementById("stationCount");
 const favoriteCount = document.getElementById("favoriteCount");
 const pills = Array.from(document.querySelectorAll(".pill"));
@@ -18,6 +22,8 @@ let activeTag = "";
 let favoriteStations = JSON.parse(localStorage.getItem("radiosHispanasFavoriteStations") || "[]");
 let recentlyPlayedStations = JSON.parse(localStorage.getItem("radiosHispanasRecentlyPlayed") || "[]");
 let favorites = favoriteStations.map(station => station.stationuuid);
+let currentPlayingStation = null;
+let preferredTheme = localStorage.getItem("radiosHispanasTheme") || "light";
 
 const spanishSpeakingCountryCodes = [
   "ES",
@@ -353,8 +359,8 @@ function playStation(station, streamUrl) {
 
   audioPlayer.play()
     .then(() => {
-      currentStation.textContent = station.name;
-      currentMeta.textContent = `${station.country || ""}${station.codec ? " · " + station.codec.toUpperCase() : ""}${station.bitrate ? " · " + station.bitrate + " kbps" : ""}`;
+      currentPlayingStation = station;
+      updatePlayerStation(station);
       statusText.textContent = `Now playing: ${station.name}`;
       saveRecentlyPlayed(station);
 
@@ -366,6 +372,42 @@ function playStation(station, streamUrl) {
       console.error(error);
       statusText.textContent = "This station could not be played in the browser. Try another one.";
     });
+}
+
+function updatePlayerStation(station) {
+  currentStation.textContent = station.name;
+  currentMeta.textContent = `${station.country || ""}${station.codec ? " · " + station.codec.toUpperCase() : ""}${station.bitrate ? " · " + station.bitrate + " kbps" : ""}`;
+
+  const initials = getInitials(station.name);
+
+  if (station.favicon) {
+    playerLogo.innerHTML = `<img src="${escapeHTML(station.favicon)}" alt="" />`;
+    const logoImage = playerLogo.querySelector("img");
+    logoImage.addEventListener("error", () => {
+      playerLogo.textContent = initials;
+    });
+  } else {
+    playerLogo.textContent = initials;
+  }
+
+  playerFavoriteButton.disabled = false;
+  stopButton.disabled = false;
+  playerFavoriteButton.classList.toggle("active", favorites.includes(station.stationuuid));
+}
+
+function stopCurrentStation() {
+  audioPlayer.pause();
+  audioPlayer.removeAttribute("src");
+  audioPlayer.load();
+
+  currentPlayingStation = null;
+  currentStation.textContent = "Nothing playing";
+  currentMeta.textContent = "Choose a station to start listening";
+  playerLogo.textContent = "RH";
+  playerFavoriteButton.disabled = true;
+  playerFavoriteButton.classList.remove("active");
+  stopButton.disabled = true;
+  statusText.textContent = "Playback stopped.";
 }
 
 function saveRecentlyPlayed(station) {
@@ -391,6 +433,10 @@ function toggleFavorite(stationId) {
 
   localStorage.setItem("radiosHispanasFavoriteStations", JSON.stringify(favoriteStations));
   updateFavoriteCount();
+
+  if (currentPlayingStation && currentPlayingStation.stationuuid === stationId) {
+    playerFavoriteButton.classList.toggle("active", favorites.includes(stationId));
+  }
 
   if (activeTag === "__favorites") {
     renderFavoriteStations();
@@ -449,6 +495,20 @@ function escapeHTML(value) {
     .replaceAll("'", "&#039;");
 }
 
+
+function applyTheme(theme) {
+  const safeTheme = theme === "dark" ? "dark" : "light";
+  document.body.classList.toggle("dark", safeTheme === "dark");
+  themeToggle.textContent = safeTheme === "dark" ? "☀️" : "🌙";
+  themeToggle.setAttribute("aria-label", safeTheme === "dark" ? "Switch to light mode" : "Switch to dark mode");
+  localStorage.setItem("radiosHispanasTheme", safeTheme);
+  preferredTheme = safeTheme;
+}
+
+function toggleTheme() {
+  applyTheme(preferredTheme === "dark" ? "light" : "dark");
+}
+
 searchButton.addEventListener("click", fetchStations);
 
 searchInput.addEventListener("keydown", event => {
@@ -468,6 +528,18 @@ pills.forEach(pill => {
   });
 });
 
+playerFavoriteButton.addEventListener("click", () => {
+  if (!currentPlayingStation) {
+    return;
+  }
+
+  toggleFavorite(currentPlayingStation.stationuuid);
+});
+
+stopButton.addEventListener("click", stopCurrentStation);
+themeToggle.addEventListener("click", toggleTheme);
+
+applyTheme(preferredTheme);
 updateFavoriteCount();
 fetchStations();
 
