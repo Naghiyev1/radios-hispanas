@@ -16,6 +16,7 @@ const pills = Array.from(document.querySelectorAll(".pill"));
 let stations = [];
 let activeTag = "";
 let favoriteStations = JSON.parse(localStorage.getItem("radiosHispanasFavoriteStations") || "[]");
+let recentlyPlayedStations = JSON.parse(localStorage.getItem("radiosHispanasRecentlyPlayed") || "[]");
 let favorites = favoriteStations.map(station => station.stationuuid);
 
 const spanishSpeakingCountryCodes = [
@@ -74,6 +75,11 @@ function updateFavoriteCount() {
 async function fetchStations() {
   if (activeTag === "__favorites") {
     renderFavoriteStations();
+    return;
+  }
+
+  if (activeTag === "__recent") {
+    renderRecentlyPlayedStations();
     return;
   }
 
@@ -242,6 +248,11 @@ function playStation(station, streamUrl) {
       currentStation.textContent = station.name;
       currentMeta.textContent = `${station.country || ""}${station.codec ? " · " + station.codec.toUpperCase() : ""}${station.bitrate ? " · " + station.bitrate + " kbps" : ""}`;
       statusText.textContent = `Now playing: ${station.name}`;
+      saveRecentlyPlayed(station);
+
+      if (activeTag === "__recent") {
+        renderRecentlyPlayedStations();
+      }
     })
     .catch(error => {
       console.error(error);
@@ -249,9 +260,18 @@ function playStation(station, streamUrl) {
     });
 }
 
+function saveRecentlyPlayed(station) {
+  recentlyPlayedStations = recentlyPlayedStations.filter(item => item.stationuuid !== station.stationuuid);
+  recentlyPlayedStations.unshift(station);
+  recentlyPlayedStations = recentlyPlayedStations.slice(0, 20);
+
+  localStorage.setItem("radiosHispanasRecentlyPlayed", JSON.stringify(recentlyPlayedStations));
+}
+
 function toggleFavorite(stationId) {
   const station = stations.find(item => item.stationuuid === stationId)
-    || favoriteStations.find(item => item.stationuuid === stationId);
+    || favoriteStations.find(item => item.stationuuid === stationId)
+    || recentlyPlayedStations.find(item => item.stationuuid === stationId);
 
   if (favorites.includes(stationId)) {
     favorites = favorites.filter(id => id !== stationId);
@@ -279,6 +299,18 @@ function renderFavoriteStations() {
   activeFilterLabel.textContent = `${selectedCountryName} · Favorites`;
   stationCount.textContent = favoriteStations.length;
   renderStations(favoriteStations);
+}
+
+function renderRecentlyPlayedStations() {
+  const selectedCountryName = countryNames[countrySelect.value] || countrySelect.value;
+
+  statusText.textContent = recentlyPlayedStations.length
+    ? `${recentlyPlayedStations.length} recently played station${recentlyPlayedStations.length === 1 ? "" : "s"}`
+    : "No recently played stations yet. Play a station and it will appear here.";
+
+  activeFilterLabel.textContent = `${selectedCountryName} · Recently Played`;
+  stationCount.textContent = recentlyPlayedStations.length;
+  renderStations(recentlyPlayedStations);
 }
 
 function getInitials(name) {
