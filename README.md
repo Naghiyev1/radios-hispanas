@@ -5,7 +5,8 @@ A simple, free radio player for Spanish-speaking radio stations across Spain, La
 ## What it does
 
 - Searches live radio stations by country
-- Supports Spanish-speaking countries including Spain, Mexico, Argentina, Colombia, Chile, Peru, Venezuela and more
+- Includes an **All Spanish-speaking countries** mode
+- Supports Spain, Mexico, Argentina, Colombia, Chile, Peru, Venezuela, Ecuador, Bolivia, Paraguay, Uruguay, Costa Rica, Panama, Dominican Republic, Guatemala, Honduras, El Salvador, Nicaragua, Cuba, Puerto Rico and the United States
 - Plays stations directly in the browser
 - Includes quick filters such as News, Music, Talk, Sports, Latin, Salsa and Rock
 - Saves favourites locally in the browser
@@ -47,7 +48,7 @@ http://localhost:8000
 
 ## Deploy on GitHub Pages
 
-1. Create a new public GitHub repository called `radios-hispanas`.
+1. Create or open your GitHub repository.
 2. Upload these files to the root of the repository.
 3. Go to **Settings**.
 4. Go to **Pages**.
@@ -57,13 +58,6 @@ http://localhost:8000
    - Folder: `/root`
 6. Save.
 
-Your app will be available at:
-
-```text
-https://yourusername.github.io/radios-hispanas/
-```
-
 ## Notes
 
 Some stations may not play because of broken streams, browser restrictions, mixed-content issues or stream formats. The app filters for stations marked as working by the Radio Browser API, but internet radio data is never perfect.
-
