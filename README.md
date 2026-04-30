@@ -10,6 +10,7 @@ A simple, free radio player for Spanish-speaking radio stations across Spain, La
 - Plays stations directly in the browser
 - Includes quick filters such as News, Music, Talk, Sports, Latin, Salsa and Rock
 - Saves favourites locally in the browser
+- Saves recently played stations locally in the browser
 - Requires no login, no backend and no paid services
 
 ## Tech stack
