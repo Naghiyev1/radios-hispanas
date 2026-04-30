@@ -551,3 +551,17 @@ audio {
     bottom: 8px;
   }
 }
+
+
+/* v6 featured section polish */
+
+.pill[data-tag="__featured"] {
+  background: #eef4ff;
+  color: var(--accent-dark);
+  border-color: rgba(37, 99, 235, 0.22);
+}
+
+.pill[data-tag="__featured"].active {
+  background: var(--accent);
+  color: white;
+}
