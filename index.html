@@ -1,2 +1,114 @@
-<link rel="stylesheet" href="style.css" />
-<script src="app.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Radios Hispanas</title>
+  <meta
+    name="description"
+    content="A simple free radio player for Spanish-speaking radio stations across Spain, Latin America and beyond."
+  />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <section class="hero-main">
+        <div>
+          <div class="eyebrow">Free radio player · Spanish-speaking world</div>
+          <h1>Radios Hispanas</h1>
+          <p>
+            Search and play Spanish-speaking radio stations from Spain, Latin America and beyond
+            with a clean, simple interface. No login, no paid services, no unnecessary machinery.
+          </p>
+        </div>
+      </section>
+
+      <aside class="hero-side">
+        <div>
+          <strong>What this version does</strong>
+          <p>
+            It pulls live station data from a free public radio directory, prioritises working
+            streams, and lets you save favourites in your browser.
+          </p>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat">
+            <span id="stationCount">0</span>
+            <small>stations loaded</small>
+          </div>
+          <div class="stat">
+            <span id="favoriteCount">0</span>
+            <small>favourites</small>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <section class="controls" aria-label="Radio search controls">
+      <input id="searchInput" type="search" placeholder="Search station, city, genre..." />
+
+      <select id="countrySelect" aria-label="Choose country">
+        <option value="ES" selected>Spain</option>
+        <option value="MX">Mexico</option>
+        <option value="AR">Argentina</option>
+        <option value="CO">Colombia</option>
+        <option value="CL">Chile</option>
+        <option value="PE">Peru</option>
+        <option value="VE">Venezuela</option>
+        <option value="EC">Ecuador</option>
+        <option value="BO">Bolivia</option>
+        <option value="PY">Paraguay</option>
+        <option value="UY">Uruguay</option>
+        <option value="CR">Costa Rica</option>
+        <option value="PA">Panama</option>
+        <option value="DO">Dominican Republic</option>
+        <option value="GT">Guatemala</option>
+        <option value="HN">Honduras</option>
+        <option value="SV">El Salvador</option>
+        <option value="NI">Nicaragua</option>
+        <option value="CU">Cuba</option>
+        <option value="PR">Puerto Rico</option>
+        <option value="US">United States</option>
+      </select>
+
+      <button id="searchButton" type="button">Search</button>
+    </section>
+
+    <section class="filter-pills" aria-label="Quick filters">
+      <button class="pill active" type="button" data-tag="">Popular</button>
+      <button class="pill" type="button" data-tag="__favorites">Favorites</button>
+      <button class="pill" type="button" data-tag="news">News</button>
+      <button class="pill" type="button" data-tag="music">Music</button>
+      <button class="pill" type="button" data-tag="talk">Talk</button>
+      <button class="pill" type="button" data-tag="sports">Sports</button>
+      <button class="pill" type="button" data-tag="latin">Latin</button>
+      <button class="pill" type="button" data-tag="local">Local</button>
+      <button class="pill" type="button" data-tag="reggaeton">Reggaeton</button>
+      <button class="pill" type="button" data-tag="salsa">Salsa</button>
+      <button class="pill" type="button" data-tag="rock">Rock</button>
+    </section>
+
+    <div class="status-bar">
+      <span id="statusText">Loading stations...</span>
+      <strong id="activeFilterLabel">Spain · Popular</strong>
+    </div>
+
+    <main id="stationsGrid" class="stations-grid" aria-live="polite"></main>
+  </div>
+
+  <footer class="player" aria-label="Audio player">
+    <div class="now-playing">
+      <strong id="currentStation">Nothing playing</strong>
+      <span id="currentMeta">Choose a station to start listening</span>
+    </div>
+
+    <audio id="audioPlayer" controls></audio>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
