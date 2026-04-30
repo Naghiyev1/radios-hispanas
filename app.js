@@ -68,6 +68,30 @@ const countryNames = {
   US: "United States"
 };
 
+const featuredStationQueries = [
+  { name: "Cadena SER", countryCode: "ES" },
+  { name: "Los 40", countryCode: "ES" },
+  { name: "COPE", countryCode: "ES" },
+  { name: "Onda Cero", countryCode: "ES" },
+  { name: "RNE Radio Nacional", countryCode: "ES" },
+  { name: "Radio Marca", countryCode: "ES" },
+  { name: "RAC1", countryCode: "ES" },
+  { name: "Catalunya Ràdio", countryCode: "ES" },
+  { name: "Radio Mitre", countryCode: "AR" },
+  { name: "La 100", countryCode: "AR" },
+  { name: "W Radio", countryCode: "MX" },
+  { name: "Radio Fórmula", countryCode: "MX" },
+  { name: "Caracol Radio", countryCode: "CO" },
+  { name: "RCN Radio", countryCode: "CO" },
+  { name: "Blu Radio", countryCode: "CO" },
+  { name: "Radio Cooperativa", countryCode: "CL" },
+  { name: "RPP Noticias", countryCode: "PE" },
+  { name: "Unión Radio", countryCode: "VE" },
+  { name: "Radio Caracas Radio", countryCode: "VE" },
+  { name: "Zeta 93", countryCode: "PR" }
+];
+
+
 function updateFavoriteCount() {
   favoriteCount.textContent = favorites.length;
 }
@@ -75,6 +99,11 @@ function updateFavoriteCount() {
 async function fetchStations() {
   if (activeTag === "__favorites") {
     renderFavoriteStations();
+    return;
+  }
+
+  if (activeTag === "__featured") {
+    await renderFeaturedStations();
     return;
   }
 
@@ -118,6 +147,85 @@ async function fetchStations() {
     statusText.textContent = "Could not load stations. The free radio directory may be temporarily unavailable.";
     stationsGrid.innerHTML = `<div class="empty-state">Something went wrong while loading stations.</div>`;
   }
+}
+
+
+async function renderFeaturedStations() {
+  const selectedCountryName = countryNames[countrySelect.value] || countrySelect.value;
+
+  statusText.textContent = "Loading curated featured stations...";
+  activeFilterLabel.textContent = `${selectedCountryName} · Featured`;
+  stationsGrid.innerHTML = "";
+  stationCount.textContent = "0";
+
+  try {
+    const featuredResults = await Promise.all(
+      featuredStationQueries.map(query =>
+        fetchFeaturedStation(query.name, query.countryCode)
+          .catch(error => {
+            console.warn(`Could not load featured station: ${query.name}`, error);
+            return null;
+          })
+      )
+    );
+
+    const searchTerm = searchInput.value.trim().toLowerCase();
+
+    const curatedStations = featuredResults
+      .filter(Boolean)
+      .filter(station => station.lastcheckok === 1)
+      .filter(station => station.url_resolved || station.url)
+      .filter(removeDuplicatesByUrl)
+      .filter(station => {
+        if (!searchTerm) {
+          return true;
+        }
+
+        return [
+          station.name,
+          station.country,
+          station.tags,
+          station.state
+        ].some(value => String(value || "").toLowerCase().includes(searchTerm));
+      });
+
+    stations = curatedStations;
+    renderStations(stations);
+
+    stationCount.textContent = stations.length;
+    statusText.textContent = stations.length
+      ? `${stations.length} featured station${stations.length === 1 ? "" : "s"} loaded`
+      : "No featured stations matched your search.";
+  } catch (error) {
+    console.error(error);
+    statusText.textContent = "Could not load featured stations.";
+    stationsGrid.innerHTML = `<div class="empty-state">Featured stations could not be loaded.</div>`;
+  }
+}
+
+async function fetchFeaturedStation(name, countryCode) {
+  const params = new URLSearchParams({
+    name,
+    countrycode: countryCode,
+    hidebroken: "true",
+    order: "clickcount",
+    reverse: "true",
+    limit: "8"
+  });
+
+  const url = `${API_BASE}/stations/search?${params.toString()}`;
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Featured station lookup failed for ${name}.`);
+  }
+
+  const results = await response.json();
+
+  return results
+    .filter(station => station.lastcheckok === 1)
+    .filter(station => station.url_resolved || station.url)
+    .sort(sortStations)[0] || null;
 }
 
 async function fetchStationsForAllCountries(searchTerm, tag) {
